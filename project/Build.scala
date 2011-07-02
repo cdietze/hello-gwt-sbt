@@ -12,7 +12,7 @@ object MyBuild extends Build {
   val gwtCompile = TaskKey[Unit]("gwt-compile", "Runs the GWT compiler to produce JavaScript")
 
   val buildSettings = Defaults.defaultSettings ++ webSettings ++ Seq(
-    ivyConfigurations += Gwt,
+  //  ivyConfigurations += Gwt,
     libraryDependencies ++= Seq(
       "com.google.gwt" % "gwt-user" % "2.3.0" % "provided",
       "com.google.gwt" % "gwt-dev" % "2.3.0" % "provided",
