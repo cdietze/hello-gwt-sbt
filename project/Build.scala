@@ -5,14 +5,15 @@ import com.github.siasia.WebPlugin._
 object MyBuild extends Build {
   lazy val helloProject = Project("hello-gwt-sbt", file("."), settings = buildSettings)
 
-  // lazy val Gwt = config("gwt") extend (Compile).hide
+  lazy val Gwt = config("gwt") extend (Compile)
 
   val gwtModules = SettingKey[Seq[String]]("gwt-modules")
   val gwtTemporaryPath = SettingKey[File]("gwt-temporary-path")
   val gwtCompile = TaskKey[Unit]("gwt-compile", "Runs the GWT compiler to produce JavaScript")
 
-  val buildSettings = Defaults.defaultSettings ++ webSettings ++ Seq(
-  //  ivyConfigurations += Gwt,
+  val buildSettings = Defaults.defaultSettings ++ webSettings ++ inConfig(Gwt)(Defaults.configSettings) ++ Seq(
+    ivyConfigurations += Gwt,
+    managedClasspath in Gwt <<= (managedClasspath in Compile, update) map ((cp, up) => cp ++ Classpaths.managedJars(Provided, Set("src"), up)),
     libraryDependencies ++= Seq(
       "com.google.gwt" % "gwt-user" % "2.3.0" % "provided",
       "com.google.gwt" % "gwt-dev" % "2.3.0" % "provided",
@@ -20,12 +21,12 @@ object MyBuild extends Build {
       "com.google.gwt" % "gwt-servlet" % "2.3.0"),
     gwtModules := List("Hello_gwt_sbt").map("net.thunderklaus.hello_gwt_sbt." + _),
     gwtTemporaryPath <<= (target) { (target) => target / "gwt" },
-    gwtCompile <<= (dependencyClasspath in Compile, javaSource in Compile, gwtModules, gwtTemporaryPath) map
-      { (dependencyClasspath, javaSource, gwtModules, tempPath) =>
+    gwtCompile <<= (dependencyClasspath in Gwt, javaSource in Compile, gwtModules, gwtTemporaryPath, streams) map
+      { (dependencyClasspath, javaSource, gwtModules, tempPath, s) =>
         {
           IO.createDirectory(tempPath)
           val command = "java -cp " + dependencyClasspath.map(_.data.toString).mkString(";") + ";" + javaSource + " com.google.gwt.dev.Compiler -war " + tempPath.absString + " " + gwtModules.mkString(" ")
-          // println("command: " + command)
+          s.log.info("command: " + command)
           command !
         }
       },
