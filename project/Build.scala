@@ -9,7 +9,7 @@ object MyBuild extends Build {
 
   val gwtModules = SettingKey[Seq[String]]("gwt-modules")
   val gwtTemporaryPath = SettingKey[File]("gwt-temporary-path")
-  val gwtCompile = TaskKey[Unit]("gwt-compile", "Runs the GWT compiler to produce JavaScript")
+  val gwtCompile = TaskKey[Unit]("gwt-compile", "Runs the GWT compiler")
 
   val buildSettings = Defaults.defaultSettings ++ webSettings ++ inConfig(Gwt)(Defaults.configSettings) ++ Seq(
     ivyConfigurations += Gwt,
@@ -25,8 +25,8 @@ object MyBuild extends Build {
       { (dependencyClasspath, javaSource, gwtModules, tempPath, s) =>
         {
           IO.createDirectory(tempPath)
-          val command = "java -cp " + dependencyClasspath.map(_.data.toString).mkString(";") + ";" + javaSource + " com.google.gwt.dev.Compiler -war " + tempPath.absString + " " + gwtModules.mkString(" ")
-          s.log.info("command: " + command)
+          val command = "java -cp " + dependencyClasspath.map(_.data.absolutePath).mkString(";") + ";" + javaSource.absolutePath + " com.google.gwt.dev.Compiler -war " + tempPath.absolutePath + " " + gwtModules.mkString(" ")
+          s.log.info("Running GWT compiler: " + command)
           command !
         }
       },
