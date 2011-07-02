@@ -23,10 +23,9 @@ object MyBuild extends Build {
     gwtCompile <<= (dependencyClasspath in Compile, javaSource in Compile, gwtModules, gwtTemporaryPath) map
       { (dependencyClasspath, javaSource, gwtModules, tempPath) =>
         {
-          println("tempPath: " + tempPath + " abs: " + tempPath.absString)
           IO.createDirectory(tempPath)
           val command = "java -cp " + dependencyClasspath.map(_.data.toString).mkString(";") + ";" + javaSource + " com.google.gwt.dev.Compiler -war " + tempPath.absString + " " + gwtModules.mkString(" ")
-          println("command: " + command)
+          // println("command: " + command)
           command !
         }
       },
