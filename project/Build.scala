@@ -14,6 +14,7 @@ object MyBuild extends Build {
   val buildSettings = Defaults.defaultSettings ++ webSettings ++ inConfig(Gwt)(Defaults.configSettings) ++ Seq(
     ivyConfigurations += Gwt,
     managedClasspath in Gwt <<= (managedClasspath in Compile, update) map ((cp, up) => cp ++ Classpaths.managedJars(Provided, Set("src"), up)),
+    autoScalaLibrary := false,
     libraryDependencies ++= Seq(
       "com.google.gwt" % "gwt-user" % "2.3.0" % "provided",
       "com.google.gwt" % "gwt-dev" % "2.3.0" % "provided",
